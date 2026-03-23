@@ -1,9 +1,6 @@
 const errorBox = document.getElementById("error");
 
-const getBaseUrl = () => {
-  const base = document.getElementById("base-url").value.trim();
-  return base ? base.replace(/\/$/, "") : "";
-};
+const getBaseUrl = () => document.getElementById("base-url").value.replace(/\/$/, "");
 
 async function apiPost(path, payload) {
   const response = await fetch(`${getBaseUrl()}${path}`, {
