@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CTF Web Hub</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero card">
+        <h1>CTF Web Hub</h1>
+        <p>Минимальный набор веб-инструментов с отдельными страницами для каждого модуля.</p>
+      </header>
+
+      <section>
+        <h2>Encoders / Decoders</h2>
+        <div class="grid">
+          <a class="card tile" href="./pages/transform/url.html"><h3>URL Encode/Decode</h3><p>Отдельная страница только под URL.</p></a>
+          <a class="card tile" href="./pages/transform/base64.html"><h3>Base64</h3><p>Кодирование и декодирование Base64.</p></a>
+          <a class="card tile" href="./pages/transform/hex.html"><h3>Hex</h3><p>Текст ↔ hex.</p></a>
+          <a class="card tile" href="./pages/transform/html.html"><h3>HTML Entities</h3><p>Escape/Unescape HTML.</p></a>
+          <a class="card tile" href="./pages/transform/rot13.html"><h3>ROT13</h3><p>Быстрое преобразование ROT13.</p></a>
+          <a class="card tile" href="./pages/transform/caesar.html"><h3>Caesar</h3><p>Отдельно от URL/Base.</p></a>
+          <a class="card tile" href="./pages/transform/unicode.html"><h3>Unicode Normalize</h3><p>NFC/NFD/NFKC/NFKD.</p></a>
+        </div>
+      </section>
+
+      <section>
+        <h2>Token & Session</h2>
+        <div class="grid">
+          <a class="card tile" href="./pages/jwt.html"><h3>JWT Toolkit</h3><p>Decode/Sign/Verify (HS256/384/512).</p></a>
+          <a class="card tile" href="./pages/flask-unsign.html"><h3>Flask-unsign</h3><p>Decode/Sign/Verify cookie.</p></a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
