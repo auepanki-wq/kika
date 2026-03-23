@@ -3,49 +3,24 @@
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
 
-* { box-sizing: border-box; }
-
 body {
   margin: 0;
-  background: radial-gradient(circle at top, #172554, #0f172a 45%);
+  background: #0f172a;
   color: #e2e8f0;
 }
 
 .container {
-  max-width: 980px;
-  margin: 28px auto;
-  padding: 0 16px 24px;
-}
-
-.hero {
-  margin-bottom: 20px;
-}
-
-h1, h2, h3 { margin-top: 0; }
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
+  max-width: 920px;
+  margin: 24px auto;
+  padding: 0 16px;
 }
 
 .card {
-  background: rgba(30, 41, 59, 0.92);
+  background: #1e293b;
   border: 1px solid #334155;
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 10px 20px rgba(2, 6, 23, 0.18);
-}
-
-.tile {
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.12s ease, border-color 0.12s ease;
-}
-
-.tile:hover {
-  transform: translateY(-2px);
-  border-color: #60a5fa;
+  margin: 16px 0;
 }
 
 label {
@@ -60,10 +35,11 @@ button {
   width: 100%;
   margin-top: 6px;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid #475569;
   background: #0b1220;
   color: #e2e8f0;
+  box-sizing: border-box;
 }
 
 button {
@@ -74,19 +50,20 @@ button {
   cursor: pointer;
 }
 
-button:hover { background: #1d4ed8; }
-
-.back {
-  display: inline-block;
-  margin: 4px 0 12px;
-  color: #93c5fd;
-  text-decoration: none;
+button:hover {
+  background: #1d4ed8;
 }
 
-.back:hover { text-decoration: underline; }
+.hint {
+  color: #94a3b8;
+}
+
+.api-base {
+  display: block;
+  margin-top: 12px;
+}
 
 #error {
   color: #fca5a5;
   white-space: pre-wrap;
-  margin-top: 12px;
 }

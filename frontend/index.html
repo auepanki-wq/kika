@@ -3,36 +3,122 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CTF Web Hub</title>
+    <title>CTF Web Hub — Tools</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="container">
-      <header class="hero card">
-        <h1>CTF Web Hub</h1>
-        <p>Минимальный набор веб-инструментов с отдельными страницами для каждого модуля.</p>
-      </header>
+      <h1>CTF Web Hub — Lightweight Tools</h1>
+      <p class="hint">MVP для VPS 2GB: декодеры + JWT + Flask-unsign.</p>
 
-      <section>
-        <h2>Encoders / Decoders</h2>
-        <div class="grid">
-          <a class="card tile" href="./pages/transform/url.html"><h3>URL Encode/Decode</h3><p>Отдельная страница только под URL.</p></a>
-          <a class="card tile" href="./pages/transform/base64.html"><h3>Base64</h3><p>Кодирование и декодирование Base64.</p></a>
-          <a class="card tile" href="./pages/transform/hex.html"><h3>Hex</h3><p>Текст ↔ hex.</p></a>
-          <a class="card tile" href="./pages/transform/html.html"><h3>HTML Entities</h3><p>Escape/Unescape HTML.</p></a>
-          <a class="card tile" href="./pages/transform/rot13.html"><h3>ROT13</h3><p>Быстрое преобразование ROT13.</p></a>
-          <a class="card tile" href="./pages/transform/caesar.html"><h3>Caesar</h3><p>Отдельно от URL/Base.</p></a>
-          <a class="card tile" href="./pages/transform/unicode.html"><h3>Unicode Normalize</h3><p>NFC/NFD/NFKC/NFKD.</p></a>
-        </div>
+      <label class="api-base">
+        API base URL
+        <input id="base-url" value="http://127.0.0.1:8000" />
+      </label>
+
+      <section class="card">
+        <h2>Decoder / Encoder</h2>
+        <form id="transform-form">
+          <label>Codec
+            <select id="codec">
+              <option value="url">URL</option>
+              <option value="base64">Base64</option>
+              <option value="hex">Hex</option>
+              <option value="html">HTML entities</option>
+              <option value="rot13">ROT13</option>
+              <option value="caesar">Caesar</option>
+              <option value="unicode_normalize">Unicode normalize</option>
+            </select>
+          </label>
+          <label>Direction
+            <select id="direction">
+              <option value="encode">Encode</option>
+              <option value="decode">Decode</option>
+            </select>
+          </label>
+          <label>Shift (Caesar)
+            <input id="shift" type="number" value="3" />
+          </label>
+          <label>Unicode form
+            <select id="normalization-form">
+              <option value="NFC">NFC</option>
+              <option value="NFD">NFD</option>
+              <option value="NFKC">NFKC</option>
+              <option value="NFKD">NFKD</option>
+            </select>
+          </label>
+          <label>Input
+            <textarea id="transform-input" rows="4"></textarea>
+          </label>
+          <button type="submit">Transform</button>
+          <textarea id="transform-output" rows="4" readonly></textarea>
+        </form>
       </section>
 
-      <section>
-        <h2>Token & Session</h2>
-        <div class="grid">
-          <a class="card tile" href="./pages/jwt.html"><h3>JWT Toolkit</h3><p>Decode/Sign/Verify (HS256/384/512).</p></a>
-          <a class="card tile" href="./pages/flask-unsign.html"><h3>Flask-unsign</h3><p>Decode/Sign/Verify cookie.</p></a>
-        </div>
+      <section class="card">
+        <h2>JWT Toolkit (HS256/384/512)</h2>
+        <form id="jwt-form">
+          <label>Action
+            <select id="jwt-action">
+              <option value="decode">Decode</option>
+              <option value="sign">Sign</option>
+              <option value="verify">Verify</option>
+            </select>
+          </label>
+          <label>Token
+            <textarea id="jwt-token" rows="3"></textarea>
+          </label>
+          <label>Secret
+            <input id="jwt-secret" />
+          </label>
+          <label>Algorithm (for sign)
+            <select id="jwt-algorithm">
+              <option value="HS256">HS256</option>
+              <option value="HS384">HS384</option>
+              <option value="HS512">HS512</option>
+            </select>
+          </label>
+          <label>Header JSON (for sign)
+            <textarea id="jwt-header" rows="3">{"alg":"HS256","typ":"JWT"}</textarea>
+          </label>
+          <label>Payload JSON (for sign)
+            <textarea id="jwt-payload" rows="3">{"sub":"user"}</textarea>
+          </label>
+          <button type="submit">Run JWT action</button>
+          <textarea id="jwt-output" rows="6" readonly></textarea>
+        </form>
       </section>
+
+      <section class="card">
+        <h2>Flask-unsign Toolkit</h2>
+        <form id="flask-form">
+          <label>Action
+            <select id="flask-action">
+              <option value="decode">Decode</option>
+              <option value="sign">Sign</option>
+              <option value="verify">Verify</option>
+            </select>
+          </label>
+          <label>Cookie
+            <textarea id="flask-cookie" rows="3"></textarea>
+          </label>
+          <label>Secret
+            <input id="flask-secret" />
+          </label>
+          <label>Salt
+            <input id="flask-salt" value="cookie-session" />
+          </label>
+          <label>Payload JSON (for sign)
+            <textarea id="flask-payload" rows="3">{"role":"user"}</textarea>
+          </label>
+          <button type="submit">Run Flask action</button>
+          <textarea id="flask-output" rows="6" readonly></textarea>
+        </form>
+      </section>
+
+      <pre id="error"></pre>
     </main>
+
+    <script src="./main.js" type="module"></script>
   </body>
 </html>
