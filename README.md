@@ -1,12 +1,20 @@
 # CTF Web Hub (MVP)
 
-Лёгкий MVP с упором на декодеры/энкодеры для маломощного VPS.
+Лёгкий MVP с упором на инструменты для маломощного VPS.
 
 ## Что реализовано
 
-- FastAPI endpoint `POST /api/transform`
-- Кодеки: URL, Base64, Hex, HTML entities, ROT13, Caesar, Unicode normalize
-- Простой frontend для ручного тестирования
+- Decoder/Encoder API `POST /api/transform`
+- Поддержка кодеков: URL, Base64, Hex, HTML entities, ROT13, Caesar, Unicode normalize
+- JWT toolkit API:
+  - `POST /api/jwt/decode`
+  - `POST /api/jwt/sign` (HS256/384/512)
+  - `POST /api/jwt/verify`
+- Flask-unsign toolkit API:
+  - `POST /api/flask-unsign/decode`
+  - `POST /api/flask-unsign/sign`
+  - `POST /api/flask-unsign/verify`
+- Простой frontend для ручного тестирования всех модулей
 
 ## Запуск backend
 

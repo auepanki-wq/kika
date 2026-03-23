@@ -1,32 +1,14 @@
 from __future__ import annotations
 
-import base64
-import binascii
-import codecs
-import html
-import string
-import urllib.parse
-import unicodedata
-from enum import Enum
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-
-class Direction(str, Enum):
-    ENCODE = "encode"
-    DECODE = "decode"
-
-
-class CodecName(str, Enum):
-    URL = "url"
-    BASE64 = "base64"
-    HEX = "hex"
-    HTML = "html"
-    ROT13 = "rot13"
-    CAESAR = "caesar"
-    UNICODE_NORMALIZE = "unicode_normalize"
+from app.services.flask_unsign_tools import decode_cookie, sign_cookie, verify_cookie
+from app.services.jwt_tools import decode_jwt, sign_jwt, verify_jwt
+from app.services.transformers import CodecName, Direction, transform_text
 
 
 class TransformRequest(BaseModel):
@@ -44,7 +26,65 @@ class TransformResponse(BaseModel):
     output: str
 
 
-app = FastAPI(title="CTF Web Hub API", version="0.1.0")
+class JWTDecodeRequest(BaseModel):
+    token: str
+
+
+class JWTDecodeResponse(BaseModel):
+    header: dict[str, Any]
+    payload: dict[str, Any]
+    signature: str
+
+
+class JWTSignRequest(BaseModel):
+    header: dict[str, Any]
+    payload: dict[str, Any]
+    secret: str
+    algorithm: str = "HS256"
+
+
+class JWTSignResponse(BaseModel):
+    token: str
+
+
+class JWTVerifyRequest(BaseModel):
+    token: str
+    secret: str
+
+
+class JWTVerifyResponse(BaseModel):
+    valid: bool
+
+
+class FlaskDecodeRequest(BaseModel):
+    cookie: str
+
+
+class FlaskDecodeResponse(BaseModel):
+    payload: dict[str, Any]
+
+
+class FlaskSignRequest(BaseModel):
+    payload: dict[str, Any]
+    secret: str
+    salt: str = "cookie-session"
+
+
+class FlaskSignResponse(BaseModel):
+    cookie: str
+
+
+class FlaskVerifyRequest(BaseModel):
+    cookie: str
+    secret: str
+    salt: str = "cookie-session"
+
+
+class FlaskVerifyResponse(BaseModel):
+    valid: bool
+
+
+app = FastAPI(title="CTF Web Hub API", version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -63,86 +103,68 @@ def health() -> dict[str, str]:
 @app.post("/api/transform", response_model=TransformResponse)
 def transform(req: TransformRequest) -> TransformResponse:
     try:
-        output = _transform(req)
+        output = transform_text(
+            codec=req.codec,
+            direction=req.direction,
+            value=req.value,
+            shift=req.shift,
+            normalization_form=req.normalization_form,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    return TransformResponse(
-        codec=req.codec,
-        direction=req.direction,
-        input=req.value,
-        output=output,
-    )
+    return TransformResponse(codec=req.codec, direction=req.direction, input=req.value, output=output)
 
 
-def _transform(req: TransformRequest) -> str:
-    if req.codec == CodecName.URL:
-        return _url(req.value, req.direction)
-    if req.codec == CodecName.BASE64:
-        return _base64(req.value, req.direction)
-    if req.codec == CodecName.HEX:
-        return _hex(req.value, req.direction)
-    if req.codec == CodecName.HTML:
-        return _html(req.value, req.direction)
-    if req.codec == CodecName.ROT13:
-        return codecs.encode(req.value, "rot_13")
-    if req.codec == CodecName.CAESAR:
-        return _caesar(req.value, req.direction, req.shift)
-    if req.codec == CodecName.UNICODE_NORMALIZE:
-        return _unicode_normalize(req.value, req.normalization_form)
-    raise ValueError(f"Unsupported codec: {req.codec}")
-
-
-def _url(value: str, direction: Direction) -> str:
-    if direction == Direction.ENCODE:
-        return urllib.parse.quote(value, safe="")
-    return urllib.parse.unquote(value)
-
-
-def _base64(value: str, direction: Direction) -> str:
-    if direction == Direction.ENCODE:
-        return base64.b64encode(value.encode("utf-8")).decode("ascii")
+@app.post("/api/jwt/decode", response_model=JWTDecodeResponse)
+def jwt_decode(req: JWTDecodeRequest) -> JWTDecodeResponse:
     try:
-        decoded = base64.b64decode(value, validate=True)
-    except binascii.Error as exc:
-        raise ValueError("Invalid base64 input") from exc
-    return decoded.decode("utf-8", errors="replace")
-
-
-def _hex(value: str, direction: Direction) -> str:
-    if direction == Direction.ENCODE:
-        return value.encode("utf-8").hex()
-    try:
-        decoded = bytes.fromhex(value)
+        parts = decode_jwt(req.token)
     except ValueError as exc:
-        raise ValueError("Invalid hex input") from exc
-    return decoded.decode("utf-8", errors="replace")
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return JWTDecodeResponse(header=parts.header, payload=parts.payload, signature=parts.signature)
 
 
-def _html(value: str, direction: Direction) -> str:
-    if direction == Direction.ENCODE:
-        return html.escape(value)
-    return html.unescape(value)
+@app.post("/api/jwt/sign", response_model=JWTSignResponse)
+def jwt_sign(req: JWTSignRequest) -> JWTSignResponse:
+    try:
+        token = sign_jwt(req.header, req.payload, req.secret, req.algorithm)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return JWTSignResponse(token=token)
 
 
-def _caesar(value: str, direction: Direction, shift: int) -> str:
-    if direction == Direction.DECODE:
-        shift = -shift
-
-    def shift_char(char: str) -> str:
-        if char in string.ascii_lowercase:
-            base = ord("a")
-            return chr((ord(char) - base + shift) % 26 + base)
-        if char in string.ascii_uppercase:
-            base = ord("A")
-            return chr((ord(char) - base + shift) % 26 + base)
-        return char
-
-    return "".join(shift_char(char) for char in value)
+@app.post("/api/jwt/verify", response_model=JWTVerifyResponse)
+def jwt_verify(req: JWTVerifyRequest) -> JWTVerifyResponse:
+    try:
+        valid = verify_jwt(req.token, req.secret)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return JWTVerifyResponse(valid=valid)
 
 
-def _unicode_normalize(value: str, normalization_form: str) -> str:
-    valid_forms = {"NFC", "NFD", "NFKC", "NFKD"}
-    if normalization_form not in valid_forms:
-        raise ValueError("normalization_form must be one of NFC, NFD, NFKC, NFKD")
-    return unicodedata.normalize(normalization_form, value)
+@app.post("/api/flask-unsign/decode", response_model=FlaskDecodeResponse)
+def flask_decode(req: FlaskDecodeRequest) -> FlaskDecodeResponse:
+    try:
+        payload = decode_cookie(req.cookie)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return FlaskDecodeResponse(payload=payload)
+
+
+@app.post("/api/flask-unsign/sign", response_model=FlaskSignResponse)
+def flask_sign(req: FlaskSignRequest) -> FlaskSignResponse:
+    try:
+        cookie = sign_cookie(payload=req.payload, secret=req.secret, salt=req.salt)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return FlaskSignResponse(cookie=cookie)
+
+
+@app.post("/api/flask-unsign/verify", response_model=FlaskVerifyResponse)
+def flask_verify(req: FlaskVerifyRequest) -> FlaskVerifyResponse:
+    try:
+        valid = verify_cookie(cookie_value=req.cookie, secret=req.secret, salt=req.salt)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return FlaskVerifyResponse(valid=valid)
