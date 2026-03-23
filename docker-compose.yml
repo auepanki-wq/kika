@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ctfhub-backend
+    restart: unless-stopped
+    networks:
+      - app_net
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ctfhub-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - app_net
+    ports:
+      - "8080:80"
+
+networks:
+  app_net:
+    driver: bridge
+
+volumes:
+  app_data:
