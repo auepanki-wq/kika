@@ -1,0 +1,63 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.container {
+  max-width: 860px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 12px;
+}
+
+input,
+select,
+textarea,
+button {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #475569;
+  background: #0b1220;
+  color: #e2e8f0;
+  box-sizing: border-box;
+}
+
+button {
+  background: #2563eb;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.hint {
+  color: #94a3b8;
+}
+
+#error {
+  color: #fca5a5;
+  white-space: pre-wrap;
+}

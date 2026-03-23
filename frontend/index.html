@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CTF Web Hub — Decoder Lab</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Decoder / Encoder Lab</h1>
+      <p class="hint">Лёгкий MVP для теста декодеров на VPS 2GB.</p>
+
+      <form id="transform-form" class="card">
+        <label>
+          API base URL
+          <input id="base-url" value="http://127.0.0.1:8000" />
+        </label>
+
+        <label>
+          Codec
+          <select id="codec">
+            <option value="url">URL</option>
+            <option value="base64">Base64</option>
+            <option value="hex">Hex</option>
+            <option value="html">HTML entities</option>
+            <option value="rot13">ROT13</option>
+            <option value="caesar">Caesar</option>
+            <option value="unicode_normalize">Unicode normalize</option>
+          </select>
+        </label>
+
+        <label>
+          Direction
+          <select id="direction">
+            <option value="encode">Encode</option>
+            <option value="decode">Decode</option>
+          </select>
+        </label>
+
+        <label>
+          Shift (для Caesar)
+          <input id="shift" type="number" value="3" />
+        </label>
+
+        <label>
+          Unicode form
+          <select id="normalization-form">
+            <option value="NFC">NFC</option>
+            <option value="NFD">NFD</option>
+            <option value="NFKC">NFKC</option>
+            <option value="NFKD">NFKD</option>
+          </select>
+        </label>
+
+        <label>
+          Input
+          <textarea id="input" rows="6" placeholder="Введите значение..."></textarea>
+        </label>
+
+        <button type="submit">Transform</button>
+      </form>
+
+      <section class="card">
+        <h2>Output</h2>
+        <textarea id="output" rows="6" readonly></textarea>
+        <pre id="error"></pre>
+      </section>
+    </main>
+
+    <script src="./main.js" type="module"></script>
+  </body>
+</html>
